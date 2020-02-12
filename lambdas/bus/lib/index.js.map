@@ -1,0 +1,1 @@
+{"version":3,"sources":["../src/index.js"],"names":["handler","event"],"mappings":";;;;;AAAA,MAAMA,OAAO,GAAG,MAAOC,KAAP,IAAiB;AAC/B,SAAO,cAAP;AACD,CAFD;;eAIeD,O","sourcesContent":["const handler = async (event) => {\n  return 'Hello world!'\n}\n\nexport default handler\n"],"file":"index.js"}

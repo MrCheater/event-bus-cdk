@@ -1,0 +1,41 @@
+{
+  "name": "event-bus-cdk",
+  "private": true,
+  "version": "0.0.1",
+  "license": "MIT",
+  "scripts": {
+    "prettier": "prettier-eslint --write \"./**/*.{js,json}\"",
+    "lint": "eslint .",
+    "testcafe-serverless-cli": "testcafe-serverless-cli",
+    "prepare": "npx oao all \"npx rimraf lib\" && oao run-script prepare && scripts/build-lambdas/bin/index.js",
+    "clean": "npx oao all \"npx rimraf lib node_modules\"",
+    "cdk": "cdk"
+  },
+  "devDependencies": {
+    "@aws-cdk/core":"^1.23.0",
+    "@aws-cdk/aws-s3-assets":"^1.23.0",
+    "@aws-cdk/aws-lambda":"^1.23.0",
+    "aws-cdk": "^1.23.0",
+    "eslint": "5.16.0",
+    "prettier-eslint-cli": "4.7.1",
+    "babel-eslint": "10.0.1",
+    "@babel/core": "7.4.5",
+    "@babel/preset-env": "7.4.5",
+    "@babel/cli": "7.4.4",
+    "@babel/node": "^7.8.4",
+    "archiver": "3.0.0",
+    "rimraf": "2.6.3",
+    "oao": "1.8.0",
+    "@event-bus-cdk/build-lambdas": "0.0.1"
+  },
+  "workspaces": {
+    "packages": [
+      "lambdas/*",
+      "scripts/*"
+    ],
+    "nohoist": [
+      "**",
+      "**/**"
+    ]
+  }
+}

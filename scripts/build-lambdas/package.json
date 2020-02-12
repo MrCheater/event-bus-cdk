@@ -1,0 +1,14 @@
+{
+  "name": "@event-bus-cdk/build-lambdas",
+  "private": true,
+  "version": "0.0.1",
+  "bin": "./bin/index.js",
+  "scripts": {
+    "prepare": "babel --config-file=../../.babelrc --source-maps --out-dir lib src"
+  },
+  "devDependencies": {
+    "@babel/core": "7.4.5",
+    "@babel/preset-env": "7.4.5",
+    "@babel/cli": "7.4.4"
+  }
+}
