@@ -1,25 +1,25 @@
 import { pushNotification } from './pushNotification'
 import { pullNotifications } from './pullNotifications'
-import { create, drop } from './database'
-import { createPool } from './createPool'
+import { create, drop } from './lifecycle'
+import { updateEnvs } from './constants'
 
 const handler = async (event, context) => {
   context.callbackWaitsForEmptyEventLoop = false
-  const pool = createPool(context)
+  updateEnvs(context)
 
   switch (event.type) {
     case 'create': {
-      return create(pool)
+      return create()
     }
     case 'drop': {
-      return drop(pool)
+      return drop()
     }
     case 'push': {
-      return pushNotification(pool, event.payload)
+      return pushNotification(event.payload)
     }
     case 'pull': {
       const { subscriptionId } = event.payload
-      return pullNotifications(pool, subscriptionId)
+      return pullNotifications(subscriptionId)
     }
     case 'heartbeatBatch': {
     }
@@ -27,8 +27,10 @@ const handler = async (event, context) => {
     }
     case 'failureBatch': {
     }
+    default: {
+      throw new Error(`Unknown event.type = ${event.type}`)
+    }
   }
-  return 'Hello world!'
 }
 
 export default handler

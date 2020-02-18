@@ -9,10 +9,7 @@ const monorepoDir = path.join(__dirname, '..', '..', '..')
 console.log(monorepoDir)
 
 const lambdasRootDir = path.join(monorepoDir, 'lambdas')
-const bundledLambdasDir = path.join(
-  monorepoDir,
-  '.lambdas'
-)
+const bundledLambdasDir = path.join(monorepoDir, '.lambdas')
 
 const assetsDirectories = fs
   .readdirSync(lambdasRootDir)
@@ -35,10 +32,7 @@ const buildLambda = directory =>
     })
 
     const output = fs.createWriteStream(
-      path.join(
-        bundledLambdasDir,
-        safeName(directory.substr(lambdasRootDir.length + 1))
-      )
+      path.join(bundledLambdasDir, safeName(directory.substr(lambdasRootDir.length + 1)))
     )
 
     const archive = archiver('zip', {
@@ -64,8 +58,6 @@ const main = async () => {
       clean(directory)
 
       await buildLambda(directory)
-
-      clean(directory)
     }
   } catch (error) {
     console.error(error)

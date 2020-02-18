@@ -4,9 +4,8 @@
   "version": "0.0.1",
   "license": "MIT",
   "scripts": {
-    "prettier": "prettier-eslint --write \"./**/*.{js,json}\"",
+    "prettier": "prettier-eslint --write \"{,!(node_modules)/**/}*.{js,json}\"",
     "lint": "eslint .",
-    "testcafe-serverless-cli": "testcafe-serverless-cli",
     "prepare": "npx oao all \"npx rimraf lib\" && oao run-script prepare && scripts/build-lambdas/bin/index.js",
     "clean": "npx oao all \"npx rimraf lib node_modules\"",
     "cdk": "cdk"

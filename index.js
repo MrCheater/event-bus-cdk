@@ -8,26 +8,25 @@ const monorepoRoot = path.join(__dirname)
 
 class Stack extends cdk.Stack {
   constructor(scope, id, props) {
-    super(scope, id, props);
+    super(scope, id, props)
 
     const busAsset = new assets.Asset(this, 'Bus', {
-      path: path.join(
-        monorepoRoot,
-        '.lambdas',
-        'bus.zip'
-      )
+      path: path.join(monorepoRoot, '.lambdas', 'bus.zip')
     })
 
     const busLambda = new lambda.Function(this, 'bus-lambda', {
-      code: lambda.Code.fromAsset(path.join(
-        monorepoRoot,
-        '.lambdas',
-        'bus.zip'
-      )),
+      code: lambda.Code.fromAsset(path.join(monorepoRoot, '.lambdas', 'bus.zip')),
       //lambda.Code.fromAsset(busAsset.assetPath),
       handler: 'index.default',
       timeout: cdk.Duration.seconds(300),
-      runtime: lambda.Runtime.NODEJS_10_X
+      runtime: lambda.Runtime.NODEJS_10_X,
+      environment: {
+        REGION: process.env.REGION,
+        RESOURCE_ARN: process.env.RESOURCE_ARN,
+        ADMIN_SECRET_ARN: process.env.ADMIN_SECRET_ARN,
+        STAGE_NAME: process.env.STAGE_NAME,
+        MAJOR: process.env.MAJOR
+      }
     })
   }
 }
@@ -40,4 +39,3 @@ new Stack(app, 'Eventbus-Stack', {
     account: '650139044964'
   }
 })
-

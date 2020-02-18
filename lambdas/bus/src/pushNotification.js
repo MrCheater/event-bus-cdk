@@ -1,14 +1,28 @@
-import { LONG_INTEGER_SQL_TYPE, JSON_SQL_TYPE } from './constants'
+import { LONG_INTEGER_SQL_TYPE, JSON_SQL_TYPE, REGION, RESOURCE_ARN, SECRET_ARN } from './constants'
 
-const invokeFunction = async (subscriptionId) => {
+const invokeFunction = async subscriptionId => {
   console.log(subscriptionId)
 }
 
 export async function pushNotification(pool, event) {
-  const { executeStatement, escapeId, escapeStr, databaseName, subscribersTableName, notificationsTableName } = pool
+  const {
+    executeStatement,
+    escapeId,
+    escapeStr,
+    databaseName,
+    subscribersTableName,
+    notificationsTableName
+  } = pool
 
-  const rows = await executeStatement(`
-    WITH "subscriptionIds" AS (
+  const postgresUser = {
+    region: REGION,
+    resourceArn: RESOURCE_ARN,
+    secretArn: SECRET_ARN
+  }
+
+  const rows = await executeStatement(
+    postgresUser,
+    `WITH "subscriptionIds" AS (
       SELECT "S"."subscriptionId"
       FROM ${escapeId(databaseName)}.${escapeId(subscribersTableName)} "S"
       WHERE (
@@ -36,10 +50,11 @@ export async function pushNotification(pool, event) {
     )
     SELECT "subscriptionIds"."subscriptionId" AS "subscriptionId"
     FROM "subscriptionIds"
-  `)
+  `
+  )
   const applicationPromises = []
 
-  for(const { subscriptionId } of rows) {
+  for (const { subscriptionId } of rows) {
     applicationPromises.push(invokeFunction(subscriptionId))
   }
 

@@ -12,15 +12,7 @@ export function escapeId(str) {
   return `"${String(str).replace(/(["])/gi, '$1$1')}"`
 }
 
-function coercer({
-                   intValue,
-                   stringValue,
-                   bigIntValue,
-                   longValue,
-                   booleanValue,
-                   isNull,
-                   ...rest
-                 }) {
+function coercer({ intValue, stringValue, bigIntValue, longValue, booleanValue, isNull, ...rest }) {
   if (intValue != null) {
     return Number(intValue)
   }
@@ -42,14 +34,8 @@ function coercer({
   throw new Error(`Unknown type ${JSON.stringify(rest)}`)
 }
 
-
-export async function executeStatement(
-  { region, resourceArn, secretArn },
-  sql
-) {
-  const rdsDataService = new RDSDataService({
-    region
-  })
+export async function executeStatement({ resourceArn, secretArn, region }, sql) {
+  const rdsDataService = new RDSDataService({ region })
 
   log.verbose(sql)
 

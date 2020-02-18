@@ -1,12 +1,28 @@
-import uuid from "uuid/v4"
+import uuid from 'uuid/v4'
+
+import { REGION, RESOURCE_ARN, SECRET_ARN } from './constants'
 
 const pullNotifications = async (pool, subscriptionId) => {
-  const {  executeStatement, escapeId, escapeStr, databaseName, subscribersTableName, notificationsTableName } = pool
+  const {
+    executeStatement,
+    escapeId,
+    escapeStr,
+    databaseName,
+    subscribersTableName,
+    notificationsTableName
+  } = pool
   const batchId = uuid()
   let rows = []
 
+  const postgresUser = {
+    region: REGION,
+    resourceArn: RESOURCE_ARN,
+    secretArn: SECRET_ARN
+  }
+
   try {
     rows = await executeStatement(
+      postgresUser,
       `WITH "lock_rows" AS (
         SELECT * FROM ${escapeId(databaseName)}.${escapeId(notificationsTableName)}
         WHERE "subscriptionId" = ${escapeStr(subscriptionId)}
@@ -31,22 +47,16 @@ const pullNotifications = async (pool, subscriptionId) => {
       `
     )
   } catch (error) {
-    if(!/kube_error/.test(error.message)) {
+    if (!/kube_error/.test(error.message)) {
       throw error
     }
   }
 
-  if(rows.length === 0) { throw new Error('Kube error')}
+  if (rows.length === 0) {
+    throw new Error('Kube error')
+  }
 
-
-
-  console.log(
-    JSON.stringify(
-      rows,
-      null,
-      2
-    )
-  )
+  console.log(JSON.stringify(rows, null, 2))
 }
 
 export { pullNotifications }

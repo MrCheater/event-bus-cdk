@@ -61,7 +61,6 @@ const main = async () => {
     for (const directory of assetsDirectories) {
       clean(directory);
       await buildLambda(directory);
-      clean(directory);
     }
   } catch (error) {
     console.error(error);

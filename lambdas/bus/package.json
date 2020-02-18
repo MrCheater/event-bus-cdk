@@ -1,13 +1,17 @@
 {
-  "name": "@event-bus-cdk/bus",
+  "name": "bus",
   "version": "0.0.1",
   "main": "index.js",
   "license": "MIT",
   "scripts": {
     "prepare": "babel --config-file=../../.babelrc --source-maps --out-dir lib src"
   },
+  "dependencies": {
+    "uuid": "3.4.0",
+    "resolve-cloud-common": "0.0.7"
+  },
   "devDependencies": {
-    "aws-sdk": "2.471.0",
+    "aws-sdk": "2.595.0",
     "@babel/core": "7.4.5",
     "@babel/preset-env": "7.4.5",
     "@babel/cli": "7.4.4"
