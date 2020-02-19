@@ -29,7 +29,7 @@ const subscribe = async ({ eventSubscriber }) => {
     ) VALUES (
       ${escapeStr(subscriptionId)},
       ${escapeStr(eventSubscriber)},
-      'credentials',
+      '{}',
       'queueStrategy',
       'deliveryStrategy',
       'endpoint',
