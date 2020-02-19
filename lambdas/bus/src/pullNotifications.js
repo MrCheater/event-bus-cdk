@@ -29,11 +29,11 @@ const pullNotifications = async ({ subscriptionId }) => {
         AND "lock_rows"."processStartTimestamp" IS NOT NULL
       ), "updated_rows" AS (
         UPDATE ${escapeId(DATABASE_NAME)}.${escapeId(NOTIFICATIONS_TABLE_NAME)}
-        SET "processStartTimestamp" = CAST(extract(epoch from clock_timestamp()) * 1000,
-        "heartbeatTimestamp" = CAST(extract(epoch from clock_timestamp()) * 1000,
+        SET "processStartTimestamp" = CAST(extract(epoch from clock_timestamp()) * 1000 AS ${LONG_INTEGER_SQL_TYPE}),
+        "heartbeatTimestamp" = CAST(extract(epoch from clock_timestamp()) * 1000 AS ${LONG_INTEGER_SQL_TYPE}),
         "batchId" = ${escapeStr(batchId)}
         WHERE "subscriptionId" = ${escapeStr(subscriptionId)}
-        AND Count("seized_rows".*) = 0
+        AND (SELECT Count(*) FROM "seized_rows") = 0
         RETURNING *
       )
       SELECT * FROM ${escapeId(DATABASE_NAME)}.${escapeId(SUBSCRIBERS_TABLE_NAME)}
