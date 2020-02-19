@@ -48,7 +48,10 @@ export async function pushNotification(event) {
   const applicationPromises = []
 
   for (const { subscriptionId } of rows) {
-    applicationPromises.push(selfInvoke({ subscriptionId }))
+    applicationPromises.push(selfInvoke({
+      type: 'pull',
+      payload: { subscriptionId }
+    }))
   }
 
   await Promise.all(applicationPromises)
