@@ -92,7 +92,7 @@ async function createDatabase(password) {
         "endpoint" ${STRING_SQL_TYPE} NOT NULL,
         "eventTypes" ${JSON_SQL_TYPE} NOT NULL,
         "aggregateIds" ${JSON_SQL_TYPE} NOT NULL,
-        "maxParallel" ${LONG_INTEGER_SQL_TYPE},
+        "maxParallel" ${LONG_INTEGER_SQL_TYPE} NOT NULL,
         
         "successEvent" ${JSON_SQL_TYPE},
         "failedEvent" ${JSON_SQL_TYPE},
