@@ -18,8 +18,7 @@ const handler = async (event, context) => {
       return pushNotification(event.payload)
     }
     case 'pull': {
-      const { subscriptionId } = event.payload
-      return pullNotifications(subscriptionId)
+      return pullNotifications(event.payload)
     }
     case 'heartbeatBatch': {
     }

@@ -6,7 +6,7 @@ import { LONG_INTEGER_SQL_TYPE, JSON_SQL_TYPE, REGION, RESOURCE_ARN, SECRET_ARN,
 
 import { escapeId, escapeStr, executeStatement } from './postgres'
 
-const pullNotifications = async (subscriptionId) => {
+const pullNotifications = async ({ subscriptionId }) => {
   const batchId = uuid()
   let rows = []
 
