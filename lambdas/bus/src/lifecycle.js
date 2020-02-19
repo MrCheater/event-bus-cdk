@@ -24,7 +24,7 @@ import {
 import { escapeId, escapeStr, executeStatement } from './postgres'
 
 export async function create() {
-  const password = await generatePostgresPassword({ Region: region })
+  const password = await generatePostgresPassword({ Region: REGION })
   await createUser(password)
   await createDatabase(password)
 }
@@ -72,39 +72,39 @@ async function createDatabase(password) {
     postgresAdmin,
     `CREATE SCHEMA IF NOT EXISTS ${escapeId(DATABASE_NAME)};
       CREATE TABLE IF NOT EXISTS ${escapeId(DATABASE_NAME)}.${escapeId(NOTIFICATIONS_TABLE_NAME)}(
-        ${escapeId('id')} ${SERIAL_SQL_TYPE} NOT NULL,
-        ${escapeId('subscriptionId')} ${TEXT_SQL_TYPE} NOT NULL,
-        ${escapeId('incomingTimestamp')} ${LONG_INTEGER_SQL_TYPE} NOT NULL,
-        ${escapeId('processStartTimestamp')} ${LONG_INTEGER_SQL_TYPE},
-        ${escapeId('processEndTimestamp')} ${LONG_INTEGER_SQL_TYPE},
-        ${escapeId('heartbeatTimestamp')} ${LONG_INTEGER_SQL_TYPE},
-        ${escapeId('aggregateIdAndVersion')} ${TEXT_SQL_TYPE} NOT NULL,
-        ${escapeId('batchId')} ${TEXT_SQL_TYPE} NULL,
-        PRIMARY KEY(${escapeId('id')})
+        "id" ${SERIAL_SQL_TYPE} NOT NULL,
+        "subscriptionId" ${TEXT_SQL_TYPE} NOT NULL,
+        "incomingTimestamp" ${LONG_INTEGER_SQL_TYPE} NOT NULL,
+        "processStartTimestamp" ${LONG_INTEGER_SQL_TYPE},
+        "processEndTimestamp" ${LONG_INTEGER_SQL_TYPE},
+        "heartbeatTimestamp" ${LONG_INTEGER_SQL_TYPE},
+        "aggregateIdAndVersion" ${TEXT_SQL_TYPE} NOT NULL,
+        "batchId" ${TEXT_SQL_TYPE} NULL,
+        PRIMARY KEY("id")
       );
       CREATE TABLE IF NOT EXISTS ${escapeId(DATABASE_NAME)}.${escapeId(SUBSCRIBERS_TABLE_NAME)}(
-        ${escapeId('subscriptionId')} ${STRING_SQL_TYPE} NOT NULL,
-        ${escapeId('eventSubscriber')} ${STRING_SQL_TYPE} NOT NULL,
-        ${escapeId('credentials')} ${JSON_SQL_TYPE} NOT NULL,
+        "subscriptionId" ${STRING_SQL_TYPE} NOT NULL,
+        "eventSubscriber" ${STRING_SQL_TYPE} NOT NULL,
+        "credentials" ${JSON_SQL_TYPE} NOT NULL,
         
-        ${escapeId('queueStrategy')} ${STRING_SQL_TYPE} NOT NULL,
-        ${escapeId('deliveryStrategy')} ${STRING_SQL_TYPE} NOT NULL,
-        ${escapeId('endpoint')} ${STRING_SQL_TYPE} NOT NULL,
-        ${escapeId('eventTypes')} ${JSON_SQL_TYPE} NOT NULL,
-        ${escapeId('aggregateIds')} ${JSON_SQL_TYPE} NOT NULL,
-        ${escapeId('maxParallel')} ${LONG_INTEGER_SQL_TYPE},
+        "queueStrategy" ${STRING_SQL_TYPE} NOT NULL,
+        "deliveryStrategy" ${STRING_SQL_TYPE} NOT NULL,
+        "endpoint" ${STRING_SQL_TYPE} NOT NULL,
+        "eventTypes" ${JSON_SQL_TYPE} NOT NULL,
+        "aggregateIds" ${JSON_SQL_TYPE} NOT NULL,
+        "maxParallel" ${LONG_INTEGER_SQL_TYPE},
         
-        ${escapeId('successEvent')} ${JSON_SQL_TYPE},
-        ${escapeId('failedEvent')} ${JSON_SQL_TYPE},
-        ${escapeId('errors')} ${JSON_SQL_TYPE},
-        ${escapeId('cursor')} ${STRING_SQL_TYPE},
+        "successEvent" ${JSON_SQL_TYPE},
+        "failedEvent" ${JSON_SQL_TYPE},
+        "errors" ${JSON_SQL_TYPE},
+        "cursor" ${STRING_SQL_TYPE},
         
-        PRIMARY KEY(${escapeId('subscriptionId')})
+        PRIMARY KEY("subscriptionId")
       );
       
       CREATE INDEX IF NOT EXISTS ${escapeId(`${NOTIFICATIONS_TABLE_NAME}-subscriptionId`)}
-      ON ${escapeId(DATABASE_NAME)}.${escapeId(NOTIFICATIONS_TABLE_NAME)}(
-      USING BTREE(${escapeId('subscriptionId')});
+      ON ${escapeId(DATABASE_NAME)}.${escapeId(NOTIFICATIONS_TABLE_NAME)}
+      USING BTREE("subscriptionId");
 
       GRANT USAGE ON SCHEMA ${escapeId(DATABASE_NAME)} TO ${escapeId(BUS_LOGIN)};
       GRANT ALL ON SCHEMA ${escapeId(DATABASE_NAME)} TO ${escapeId(BUS_LOGIN)};

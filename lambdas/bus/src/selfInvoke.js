@@ -1,9 +1,10 @@
 import { invokeFunction } from 'resolve-cloud-common/lambda'
+import { REGION, SELF_FUNCTION_NAME } from './constants'
 
-export async function selfInvoke({ region, selfFunctionName }, payload) {
+export async function selfInvoke(payload) {
   await invokeFunction({
-    Region: region,
-    FunctionName: selfFunctionName,
+    Region: REGION,
+    FunctionName: SELF_FUNCTION_NAME,
     InvocationType: 'Event',
     Payload: payload
   })

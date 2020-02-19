@@ -1,19 +1,11 @@
-import { LONG_INTEGER_SQL_TYPE, JSON_SQL_TYPE, REGION, RESOURCE_ARN, SECRET_ARN } from './constants'
+import { LONG_INTEGER_SQL_TYPE, JSON_SQL_TYPE, REGION, RESOURCE_ARN, SECRET_ARN,
+  DATABASE_NAME, SUBSCRIBERS_TABLE_NAME, NOTIFICATIONS_TABLE_NAME
+ } from './constants'
+import { selfInvoke } from './selfInvoke'
+import { escapeId, escapeStr, executeStatement } from './postgres'
 
-const invokeFunction = async subscriptionId => {
-  console.log(subscriptionId)
-}
 
-export async function pushNotification(pool, event) {
-  const {
-    executeStatement,
-    escapeId,
-    escapeStr,
-    databaseName,
-    subscribersTableName,
-    notificationsTableName
-  } = pool
-
+export async function pushNotification(event) {
   const postgresUser = {
     region: REGION,
     resourceArn: RESOURCE_ARN,
@@ -24,21 +16,22 @@ export async function pushNotification(pool, event) {
     postgresUser,
     `WITH "subscriptionIds" AS (
       SELECT "S"."subscriptionId"
-      FROM ${escapeId(databaseName)}.${escapeId(subscribersTableName)} "S"
+      FROM ${escapeId(DATABASE_NAME)}.${escapeId(SUBSCRIBERS_TABLE_NAME)} "S"
       WHERE (
         "S"."eventTypes" -> ${escapeStr(event.type)} = 'true'::${JSON_SQL_TYPE} OR
         "S"."eventTypes" = 'null'::${JSON_SQL_TYPE}
       ) AND ( 
         "S"."aggregateIds" -> ${escapeStr(event.aggregateId)} = 'true'::${JSON_SQL_TYPE} OR
         "S"."aggregateIds" = 'null'::${JSON_SQL_TYPE}
+      )
     ), "insertingClause" AS ( 
-      INSERT INTO ${escapeId(databaseName)}.${escapeId(notificationsTableName)}(
+      INSERT INTO ${escapeId(DATABASE_NAME)}.${escapeId(NOTIFICATIONS_TABLE_NAME)}(
         "subscriptionId",
         "incomingTimestamp",
         "processStartTimestamp",
         "processEndTimestamp",
         "heartbeatTimestamp",
-        "aggregateIdAndVersion",    
+        "aggregateIdAndVersion"    
       ) SELECT 
         "subscriptionIds"."subscriptionId" AS "subscriptionId",
         CAST(extract(epoch from clock_timestamp()) * 1000 AS ${LONG_INTEGER_SQL_TYPE}) AS "incomingTimestamp",
@@ -55,7 +48,7 @@ export async function pushNotification(pool, event) {
   const applicationPromises = []
 
   for (const { subscriptionId } of rows) {
-    applicationPromises.push(invokeFunction(subscriptionId))
+    applicationPromises.push(selfInvoke({ subscriptionId }))
   }
 
   await Promise.all(applicationPromises)
