@@ -1,12 +1,19 @@
 import uuid from 'uuid/v4'
 
-import { LONG_INTEGER_SQL_TYPE, JSON_SQL_TYPE, REGION, RESOURCE_ARN, SECRET_ARN,
-  DATABASE_NAME, SUBSCRIBERS_TABLE_NAME, NOTIFICATIONS_TABLE_NAME
+import {
+  LONG_INTEGER_SQL_TYPE,
+  JSON_SQL_TYPE,
+  REGION,
+  RESOURCE_ARN,
+  SECRET_ARN,
+  DATABASE_NAME,
+  SUBSCRIBERS_TABLE_NAME,
+  NOTIFICATIONS_TABLE_NAME
 } from './constants'
 
 import { escapeId, escapeStr, executeStatement } from './postgres'
 
-const pullNotifications = async ({ subscriptionId }) => {
+export async function pullNotifications({ subscriptionId }) {
   const batchId = uuid()
   let rows = []
 
@@ -36,10 +43,11 @@ const pullNotifications = async ({ subscriptionId }) => {
         AND (SELECT Count(*) FROM "seized_rows") = 0
         RETURNING *
       )
-      SELECT * FROM ${escapeId(DATABASE_NAME)}.${escapeId(SUBSCRIBERS_TABLE_NAME)}
-      LEFT JOIN "updated_rows"
+      SELECT * FROM "updated_rows"
+      LEFT JOIN ${escapeId(DATABASE_NAME)}.${escapeId(SUBSCRIBERS_TABLE_NAME)}
       ON ${escapeId(DATABASE_NAME)}.${escapeId(SUBSCRIBERS_TABLE_NAME)}."subscriptionId" = 
       "updated_rows"."subscriptionId"
+      LIMIT 1
       `
     )
   } catch (error) {
@@ -54,5 +62,3 @@ const pullNotifications = async ({ subscriptionId }) => {
 
   console.log(JSON.stringify(rows, null, 2))
 }
-
-export { pullNotifications }

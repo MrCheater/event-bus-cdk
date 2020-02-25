@@ -2,7 +2,7 @@ import { pushNotification } from './pushNotification'
 import { pullNotifications } from './pullNotifications'
 import { create, drop } from './lifecycle'
 import { updateEnvs } from './constants'
-import {subscribe} from './subscribe'
+import { subscribe } from './subscribe'
 
 const handler = async (event, context) => {
   context.callbackWaitsForEmptyEventLoop = false

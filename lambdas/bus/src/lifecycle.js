@@ -68,6 +68,12 @@ async function createDatabase(password) {
     `ALTER USER ${escapeId(BUS_LOGIN)} PASSWORD ${escapeStr(password)};`
   )
 
+  /*
+    acknowledgmentStrategy:
+      none
+      regular-transaction
+      xa-transaction
+   */
   await executeStatement(
     postgresAdmin,
     `CREATE SCHEMA IF NOT EXISTS ${escapeId(DATABASE_NAME)};
@@ -89,6 +95,7 @@ async function createDatabase(password) {
         
         "queueStrategy" ${STRING_SQL_TYPE} NOT NULL,
         "deliveryStrategy" ${STRING_SQL_TYPE} NOT NULL,
+        "acknowledgmentStrategy" ${STRING_SQL_TYPE} NOT NULL,
         "endpoint" ${STRING_SQL_TYPE} NOT NULL,
         "eventTypes" ${JSON_SQL_TYPE} NOT NULL,
         "aggregateIds" ${JSON_SQL_TYPE} NOT NULL,
@@ -105,6 +112,10 @@ async function createDatabase(password) {
       CREATE INDEX IF NOT EXISTS ${escapeId(`${NOTIFICATIONS_TABLE_NAME}-subscriptionId`)}
       ON ${escapeId(DATABASE_NAME)}.${escapeId(NOTIFICATIONS_TABLE_NAME)}
       USING BTREE("subscriptionId");
+
+      CREATE UNIQUE INDEX IF NOT EXISTS ${escapeId(`${SUBSCRIBERS_TABLE_NAME}-eventSubscriber`)}
+      ON ${escapeId(DATABASE_NAME)}.${escapeId(SUBSCRIBERS_TABLE_NAME)}
+      USING BTREE("eventSubscriber");
 
       GRANT USAGE ON SCHEMA ${escapeId(DATABASE_NAME)} TO ${escapeId(BUS_LOGIN)};
       GRANT ALL ON SCHEMA ${escapeId(DATABASE_NAME)} TO ${escapeId(BUS_LOGIN)};
@@ -130,7 +141,15 @@ export async function dropDatabase() {
     secretArn: ADMIN_SECRET_ARN
   }
 
-  await executeStatement(postgresAdmin, `DROP SCHEMA IF EXISTS ${escapeId(DATABASE_NAME)} CASCADE`)
+  await executeStatement(
+    postgresAdmin,
+    `
+    ALTER SCHEMA ${escapeId(DATABASE_NAME)} OWNER TO SESSION_USER;
+    DROP SCHEMA IF EXISTS ${escapeId(DATABASE_NAME)} CASCADE;
+  `
+  )
+
+  await executeStatement(postgresAdmin, `DROP USER ${escapeId(BUS_LOGIN)};`)
 
   await executeStatement(
     postgresAdmin,

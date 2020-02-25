@@ -8,7 +8,8 @@
   },
   "dependencies": {
     "uuid": "3.4.0",
-    "resolve-cloud-common": "0.0.7"
+    "resolve-cloud-common": "0.0.7",
+    "diff-json": "2.0.0"
   },
   "devDependencies": {
     "aws-sdk": "2.595.0",

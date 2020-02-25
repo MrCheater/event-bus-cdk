@@ -1,9 +1,15 @@
-import { LONG_INTEGER_SQL_TYPE, JSON_SQL_TYPE, REGION, RESOURCE_ARN, SECRET_ARN,
-  DATABASE_NAME, SUBSCRIBERS_TABLE_NAME, NOTIFICATIONS_TABLE_NAME
- } from './constants'
+import {
+  LONG_INTEGER_SQL_TYPE,
+  JSON_SQL_TYPE,
+  REGION,
+  RESOURCE_ARN,
+  SECRET_ARN,
+  DATABASE_NAME,
+  SUBSCRIBERS_TABLE_NAME,
+  NOTIFICATIONS_TABLE_NAME
+} from './constants'
 import { selfInvoke } from './selfInvoke'
 import { escapeId, escapeStr, executeStatement } from './postgres'
-
 
 export async function pushNotification(event) {
   const postgresUser = {
@@ -48,10 +54,12 @@ export async function pushNotification(event) {
   const applicationPromises = []
 
   for (const { subscriptionId } of rows) {
-    applicationPromises.push(selfInvoke({
-      type: 'pull',
-      payload: { subscriptionId }
-    }))
+    applicationPromises.push(
+      selfInvoke({
+        type: 'pull',
+        payload: { subscriptionId }
+      })
+    )
   }
 
   await Promise.all(applicationPromises)
