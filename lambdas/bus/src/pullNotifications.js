@@ -27,20 +27,20 @@ export async function pullNotifications({ subscriptionId }) {
     rows = await executeStatement(
       postgresUser,
       `WITH "lock_rows" AS (
-        SELECT * FROM ${escapeId(DATABASE_NAME)}.${escapeId(NOTIFICATIONS_TABLE_NAME)}
+        SELECT "processStartTimestamp" FROM ${escapeId(DATABASE_NAME)}.${escapeId(NOTIFICATIONS_TABLE_NAME)}
         WHERE "subscriptionId" = ${escapeStr(subscriptionId)}
+        ORDER BY "id"
         FOR UPDATE NOWAIT
-      ), "seized_rows" AS (
-        SELECT * FROM "lock_rows"
-        WHERE "lock_rows"."subscriptionId" = ${escapeStr(subscriptionId)}
-        AND "lock_rows"."processStartTimestamp" IS NOT NULL
+      ), "seized_rows_count" AS (
+        SELECT Count(*) AS "value" FROM "lock_rows"
+        WHERE "lock_rows"."processStartTimestamp" IS NOT NULL
       ), "updated_rows" AS (
         UPDATE ${escapeId(DATABASE_NAME)}.${escapeId(NOTIFICATIONS_TABLE_NAME)}
         SET "processStartTimestamp" = CAST(extract(epoch from clock_timestamp()) * 1000 AS ${LONG_INTEGER_SQL_TYPE}),
         "heartbeatTimestamp" = CAST(extract(epoch from clock_timestamp()) * 1000 AS ${LONG_INTEGER_SQL_TYPE}),
         "batchId" = ${escapeStr(batchId)}
         WHERE "subscriptionId" = ${escapeStr(subscriptionId)}
-        AND (SELECT Count(*) FROM "seized_rows") = 0
+        AND (SELECT "value" FROM "seized_rows_count") = 0
         RETURNING *
       )
       SELECT * FROM "updated_rows"
